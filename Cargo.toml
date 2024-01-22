@@ -1,0 +1,14 @@
+[package]
+name = "commitment"
+version = "0.1.0"
+edition = "2021"
+license = "BSD-3-Clause-Clear"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+group = { git = "https://github.com/dwallet-labs/group.git", branch = "known_order" }
+
+[dev-dependencies]
+
+[features]
+
