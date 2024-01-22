@@ -2,10 +2,47 @@
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 
 use core::fmt::Debug;
-
+use crypto_bigint::Encoding;
+use crypto_bigint::{Concat, Limb, U128, U64};
 use serde::{Deserialize, Serialize};
 
 use group::{BoundedGroupElement, GroupElement, Samplable};
+use merlin::Transcript;
+
+/// Represents an unsigned integer sized based on the computation security parameter, denoted as
+/// $\kappa$.
+pub type ComputationalSecuritySizedNumber = U128;
+
+/// Represents an unsigned integer sized based on the statistical security parameter, denoted as
+/// $s$. Configured for 64-bit statistical security using U64.
+pub type StatisticalSecuritySizedNumber = U64;
+
+/// Represents an unsigned integer sized based on the commitment size that matches security
+/// parameter, which is double in size, as collisions can be found in the root of the space.
+pub type CommitmentSizedNumber = <ComputationalSecuritySizedNumber as Concat>::Output;
+
+#[derive(PartialEq, Debug, Eq, Serialize, Deserialize, Clone, Copy)]
+pub struct Commitment(CommitmentSizedNumber);
+
+impl Commitment {
+    pub fn commit_transcript(
+        transcript: &mut Transcript,
+        commitment_randomness: &ComputationalSecuritySizedNumber,
+    ) -> Self {
+        transcript.append_message(
+            b"schnorr proof aggregation commitment round commitment randomness",
+            commitment_randomness.to_le_bytes().as_ref(),
+        );
+
+        let mut buf: Vec<u8> = vec![0u8; CommitmentSizedNumber::LIMBS * Limb::BYTES];
+        transcript.challenge_bytes(
+            b"schnorr proof aggregation commitment round commitment",
+            buf.as_mut_slice(),
+        );
+
+        Commitment(CommitmentSizedNumber::from_le_slice(&buf))
+    }
+}
 
 /// A Homomorphic Commitment Scheme
 ///
