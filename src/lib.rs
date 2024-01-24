@@ -3,19 +3,11 @@
 
 use core::fmt::Debug;
 use crypto_bigint::Encoding;
-use crypto_bigint::{Concat, Limb, U128, U64};
+use crypto_bigint::{Concat, Limb};
 use serde::{Deserialize, Serialize};
 
-use group::{BoundedGroupElement, GroupElement, Samplable};
+use group::{BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, Samplable};
 use merlin::Transcript;
-
-/// Represents an unsigned integer sized based on the computation security parameter, denoted as
-/// $\kappa$.
-pub type ComputationalSecuritySizedNumber = U128;
-
-/// Represents an unsigned integer sized based on the statistical security parameter, denoted as
-/// $s$. Configured for 64-bit statistical security using U64.
-pub type StatisticalSecuritySizedNumber = U64;
 
 /// Represents an unsigned integer sized based on the commitment size that matches security
 /// parameter, which is double in size, as collisions can be found in the root of the space.
