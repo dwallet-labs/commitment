@@ -7,6 +7,7 @@ license = "BSD-3-Clause-Clear"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 group = { git = "https://github.com/dwallet-labs/group.git", branch = "hash2group" }
+thiserror = "1.0"
 
 [dev-dependencies]
 rand_core = { version = "0.6.4", features = ["std"] }

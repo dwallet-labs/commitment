@@ -55,11 +55,9 @@ where
         GroupElement::PublicParameters,
     >;
 
-    fn new(public_parameters: &Self::PublicParameters) -> group::Result<Self> {
+    fn new(public_parameters: &Self::PublicParameters) -> crate::Result<Self> {
         if BATCH_SIZE == 0 {
-            // TODO: this is not a group instantiation error, perhaps create different error or
-            // change the group doc
-            return Err(group::Error::InvalidPublicParameters);
+            return Err(crate::Error::InvalidPublicParameters);
         }
 
         let message_generators = public_parameters.message_generators.clone().map(|value| {
@@ -149,7 +147,7 @@ impl<
     pub fn default<
         const SCALAR_LIMBS: usize,
         GroupElement: PrimeGroupElement<SCALAR_LIMBS> + HashToGroup,
-    >() -> group::Result<Self>
+    >() -> crate::Result<Self>
     where
         GroupElement::Scalar: group::GroupElement<PublicParameters = ScalarPublicParameters>,
         GroupElement: group::GroupElement<
@@ -162,7 +160,7 @@ impl<
         Self::derive::<SCALAR_LIMBS, GroupElement>(
             ScalarPublicParameters::default(),
             GroupPublicParameters::default(),
-        )
+        )?
     }
 
     pub fn derive<
@@ -171,7 +169,7 @@ impl<
     >(
         scalar_public_parameters: group::PublicParameters<GroupElement::Scalar>,
         group_public_parameters: group::PublicParameters<GroupElement>,
-    ) -> group::Result<Self>
+    ) -> crate::Result<Self>
     where
         GroupElement::Scalar: group::GroupElement<PublicParameters = ScalarPublicParameters>,
         GroupElement: group::GroupElement<
@@ -203,7 +201,7 @@ impl<
                 message_generators,
                 randomness_generator,
             ),
-        )
+        )?
     }
 
     /// This function allows using custom Pedersen generators, which is extremely unsafe unless you

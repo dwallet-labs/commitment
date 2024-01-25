@@ -9,6 +9,20 @@ use serde::{Deserialize, Serialize};
 
 use group::{BoundedGroupElement, GroupElement, Samplable};
 
+/// Commitment error.
+#[derive(thiserror::Error, Clone, Debug, PartialEq)]
+pub enum Error {
+    #[error("invalid public parameters")]
+    InvalidPublicParameters,
+    #[error("group error")]
+    GroupInstantiation(#[from] group::Error),
+    #[error("an internal error that should never have happened and signifies a bug")]
+    InternalError,
+}
+
+/// Commitment result.
+pub type Result<T> = std::result::Result<T, Error>;
+
 /// A Homomorphic Commitment Scheme
 ///
 /// The commitment algorithm of a non-interactive commitment scheme $\Com_{\pp}$
