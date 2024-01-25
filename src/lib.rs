@@ -1,6 +1,8 @@
 // Author: dWallet Labs, LTD.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 
+pub mod pedersen;
+
 use core::fmt::Debug;
 
 use serde::{Deserialize, Serialize};
