@@ -60,19 +60,16 @@ where
             return Err(crate::Error::InvalidPublicParameters);
         }
 
-        let message_generators = public_parameters.message_generators.clone().map(|value| {
-            GroupElement::new(
-                value,
-                public_parameters.commitment_space_public_parameters(),
-            )
-        });
-
-        // Return the first error you encounter, or instantiate `Self`
-        if let Some(Err(err)) = message_generators.iter().find(|res| res.is_err()) {
-            return Err(err.clone());
-        }
-
-        let message_generators = message_generators.map(|res| res.unwrap());
+        let message_generators = public_parameters
+            .message_generators
+            .clone()
+            .map(|value| {
+                GroupElement::new(
+                    value,
+                    public_parameters.commitment_space_public_parameters(),
+                )
+            })
+            .flat_map_results()?;
 
         let randomness_generator = GroupElement::new(
             public_parameters.randomness_generator.clone(),
@@ -160,7 +157,7 @@ impl<
         Self::derive::<SCALAR_LIMBS, GroupElement>(
             ScalarPublicParameters::default(),
             GroupPublicParameters::default(),
-        )?
+        )
     }
 
     pub fn derive<
@@ -201,7 +198,7 @@ impl<
                 message_generators,
                 randomness_generator,
             ),
-        )?
+        )
     }
 
     /// This function allows using custom Pedersen generators, which is extremely unsafe unless you

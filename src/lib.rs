@@ -65,7 +65,7 @@ pub trait HomomorphicCommitmentScheme<const MESSAGE_SPACE_SCALAR_LIMBS: usize>:
 
     /// Instantiate the commitment scheme from its public parameters and the commitment space group
     /// public parameters.
-    fn new(public_parameters: &Self::PublicParameters) -> group::Result<Self>;
+    fn new(public_parameters: &Self::PublicParameters) -> Result<Self>;
 
     /// $\Com_{\pp}$: the commitment function $\calM_{\pp}\times \calR_{\pp} \rightarrow \calC_{\pp}$
     /// for message space $\calM_{\pp}$, randomness space $\calR_{\pp}$ and commitment space $\calC_{\pp}$.
