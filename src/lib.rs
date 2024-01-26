@@ -1,6 +1,7 @@
 // Author: dWallet Labs, LTD.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 
+pub mod multipedersen;
 pub mod pedersen;
 
 use core::fmt::Debug;
@@ -8,6 +9,9 @@ use core::fmt::Debug;
 use serde::{Deserialize, Serialize};
 
 use group::{BoundedGroupElement, GroupElement, Samplable};
+
+pub use multipedersen::MultiPedersen;
+pub use pedersen::Pedersen;
 
 /// Commitment error.
 #[derive(thiserror::Error, Clone, Debug, PartialEq)]
