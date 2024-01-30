@@ -258,7 +258,7 @@ dependencies = [
 [[package]]
 name = "group"
 version = "0.1.0"
-source = "git+https://github.com/dwallet-labs/group.git?branch=hash2group#b1935a3fef73f80d8023da3d7dda840b927fefbc"
+source = "git+https://github.com/dwallet-labs/group.git#bdfa95a3fc8633d01252b87c791ff14a51e73ec6"
 dependencies = [
  "crypto-bigint",
  "curve25519-dalek-ng",
