@@ -6,7 +6,9 @@ use crypto_bigint::Encoding;
 use crypto_bigint::{Concat, Limb};
 use serde::{Deserialize, Serialize};
 
-use group::{BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, Samplable};
+use group::{
+    BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, PartyID, Samplable,
+};
 use merlin::Transcript;
 
 /// Represents an unsigned integer sized based on the commitment size that matches security
@@ -18,19 +20,19 @@ pub struct Commitment(CommitmentSizedNumber);
 
 impl Commitment {
     pub fn commit_transcript(
+        party_id: PartyID,
         transcript: &mut Transcript,
         commitment_randomness: &ComputationalSecuritySizedNumber,
     ) -> Self {
+        transcript.append_message(b"party ID", party_id.to_le_bytes().as_ref());
+
         transcript.append_message(
-            b"schnorr proof aggregation commitment round commitment randomness",
+            b"commitment randomness",
             commitment_randomness.to_le_bytes().as_ref(),
         );
 
         let mut buf: Vec<u8> = vec![0u8; CommitmentSizedNumber::LIMBS * Limb::BYTES];
-        transcript.challenge_bytes(
-            b"schnorr proof aggregation commitment round commitment",
-            buf.as_mut_slice(),
-        );
+        transcript.challenge_bytes(b"commitment", buf.as_mut_slice());
 
         Commitment(CommitmentSizedNumber::from_le_slice(&buf))
     }
