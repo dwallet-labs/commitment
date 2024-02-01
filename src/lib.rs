@@ -19,12 +19,18 @@ pub type CommitmentSizedNumber = <ComputationalSecuritySizedNumber as Concat>::O
 pub struct Commitment(CommitmentSizedNumber);
 
 impl Commitment {
+    /// Create a commitment from a transcript that holds the data and, potentially, other context.
+    /// Supply a `context` to distinguish commitments between different protocols,
+    /// e.g. a string containing the protocol name & round name.
     pub fn commit_transcript(
         party_id: PartyID,
+        context: String,
         transcript: &mut Transcript,
         commitment_randomness: &ComputationalSecuritySizedNumber,
     ) -> Self {
         transcript.append_message(b"party ID", party_id.to_le_bytes().as_ref());
+
+        transcript.append_message(b"context", context.as_bytes());
 
         transcript.append_message(
             b"commitment randomness",
