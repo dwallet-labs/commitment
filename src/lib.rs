@@ -1,6 +1,5 @@
 // Author: dWallet Labs, LTD.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
-
 use core::fmt::Debug;
 use crypto_bigint::Encoding;
 use crypto_bigint::{Concat, Limb};
@@ -10,6 +9,20 @@ use group::{
     BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, PartyID, Samplable,
 };
 use merlin::Transcript;
+
+/// Commitment error.
+#[derive(thiserror::Error, Clone, Debug, PartialEq)]
+pub enum Error {
+    #[error("invalid public parameters")]
+    InvalidPublicParameters,
+    #[error("group error")]
+    GroupInstantiation(#[from] group::Error),
+    #[error("an internal error that should never have happened and signifies a bug")]
+    InternalError,
+}
+
+/// Commitment result.
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// Represents an unsigned integer sized based on the commitment size that matches security
 /// parameter, which is double in size, as collisions can be found in the root of the space.
@@ -86,7 +99,7 @@ pub trait HomomorphicCommitmentScheme<const MESSAGE_SPACE_SCALAR_LIMBS: usize>:
 
     /// Instantiate the commitment scheme from its public parameters and the commitment space group
     /// public parameters.
-    fn new(public_parameters: &Self::PublicParameters) -> group::Result<Self>;
+    fn new(public_parameters: &Self::PublicParameters) -> Result<Self>;
 
     /// $\Com_{\pp}$: the commitment function $\calM_{\pp}\times \calR_{\pp} \rightarrow \calC_{\pp}$
     /// for message space $\calM_{\pp}$, randomness space $\calR_{\pp}$ and commitment space $\calC_{\pp}$.

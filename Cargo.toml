@@ -9,6 +9,7 @@ group = { git = "https://github.com/dwallet-labs/group.git" }
 crypto-bigint = { version = "0.5.5", features = ["rand_core", "serde"], default-features = false }
 serde = { version = "1.0", features = ["derive"] }
 merlin = { version = "3", default-features = false }
+thiserror = "1.0"
 
 [dev-dependencies]
 
