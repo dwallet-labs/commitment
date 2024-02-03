@@ -1,13 +1,16 @@
 // Author: dWallet Labs, LTD.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
-
 pub mod pedersen;
 
 use core::fmt::Debug;
-
+use crypto_bigint::Encoding;
+use crypto_bigint::{Concat, Limb};
 use serde::{Deserialize, Serialize};
 
-use group::{BoundedGroupElement, GroupElement, Samplable};
+use group::{
+    BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, PartyID, Samplable,
+};
+use merlin::Transcript;
 
 /// Commitment error.
 #[derive(thiserror::Error, Clone, Debug, PartialEq)]
@@ -22,6 +25,39 @@ pub enum Error {
 
 /// Commitment result.
 pub type Result<T> = std::result::Result<T, Error>;
+
+/// Represents an unsigned integer sized based on the commitment size that matches security
+/// parameter, which is double in size, as collisions can be found in the root of the space.
+pub type CommitmentSizedNumber = <ComputationalSecuritySizedNumber as Concat>::Output;
+
+#[derive(PartialEq, Debug, Eq, Serialize, Deserialize, Clone, Copy)]
+pub struct Commitment(CommitmentSizedNumber);
+
+impl Commitment {
+    /// Create a commitment from a transcript that holds the data and, potentially, other context.
+    /// Supply a `context` to distinguish commitments between different protocols,
+    /// e.g. a string containing the protocol name & round name.
+    pub fn commit_transcript(
+        party_id: PartyID,
+        context: String,
+        transcript: &mut Transcript,
+        commitment_randomness: &ComputationalSecuritySizedNumber,
+    ) -> Self {
+        transcript.append_message(b"party ID", party_id.to_le_bytes().as_ref());
+
+        transcript.append_message(b"context", context.as_bytes());
+
+        transcript.append_message(
+            b"commitment randomness",
+            commitment_randomness.to_le_bytes().as_ref(),
+        );
+
+        let mut buf: Vec<u8> = vec![0u8; CommitmentSizedNumber::LIMBS * Limb::BYTES];
+        transcript.challenge_bytes(b"commitment", buf.as_mut_slice());
+
+        Commitment(CommitmentSizedNumber::from_le_slice(&buf))
+    }
+}
 
 /// A Homomorphic Commitment Scheme
 ///
