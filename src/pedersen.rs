@@ -348,4 +348,24 @@ mod tests {
 
         assert_eq!(expected_commitment, commitment)
     }
+
+    #[test]
+    #[cfg(feature = "test_helpers")]
+    fn test_homomorphic_commitment_scheme() {
+        let public_parameters = PublicParameters::default::<
+            { group::secp256k1::SCALAR_LIMBS },
+            group::secp256k1::GroupElement,
+        >()
+        .unwrap();
+
+        crate::test_helpers::test_homomorphic_commitment_scheme::<
+            { group::secp256k1::SCALAR_LIMBS },
+            Pedersen<
+                3,
+                { group::secp256k1::SCALAR_LIMBS },
+                group::secp256k1::Scalar,
+                group::secp256k1::GroupElement,
+            >,
+        >(&public_parameters);
+    }
 }

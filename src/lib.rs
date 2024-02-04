@@ -210,3 +210,61 @@ pub type CommitmentSpacePublicParameters<const MESSAGE_SPACE_SCALAR_LIMBS: usize
 pub type CommitmentSpaceValue<const MESSAGE_SPACE_SCALAR_LIMBS: usize, C> = group::Value<
     <C as HomomorphicCommitmentScheme<MESSAGE_SPACE_SCALAR_LIMBS>>::CommitmentSpaceGroupElement,
 >;
+
+#[cfg(feature = "test_helpers")]
+pub mod test_helpers {
+    use super::*;
+    use rand_core::OsRng;
+
+    pub fn test_homomorphic_commitment_scheme<
+        const MESSAGE_SPACE_SCALAR_LIMBS: usize,
+        CommitmentScheme: HomomorphicCommitmentScheme<MESSAGE_SPACE_SCALAR_LIMBS>,
+    >(
+        public_parameters: &CommitmentScheme::PublicParameters,
+    ) {
+        let first_message = CommitmentScheme::MessageSpaceGroupElement::sample(
+            public_parameters.message_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+        let second_message = CommitmentScheme::MessageSpaceGroupElement::sample(
+            public_parameters.message_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+
+        let first_randomness = CommitmentScheme::RandomnessSpaceGroupElement::sample(
+            public_parameters.randomness_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+        let second_randomness = CommitmentScheme::RandomnessSpaceGroupElement::sample(
+            public_parameters.randomness_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+
+        let commitment_scheme = CommitmentScheme::new(public_parameters).unwrap();
+        let first_commitment = commitment_scheme.commit(&first_message, &first_randomness);
+        let second_commitment = commitment_scheme.commit(&second_message, &second_randomness);
+
+        assert_ne!(
+            first_commitment, second_commitment,
+            "commitments over different messages should differ"
+        );
+        assert_ne!(
+            first_commitment,
+            commitment_scheme.commit(&first_message, &second_randomness),
+            "commitments over the same message using different randomness should differ"
+        );
+
+        assert_eq!(
+            first_commitment + second_commitment,
+            commitment_scheme.commit(
+                &(first_message + second_message),
+                &(first_randomness + second_randomness)
+            ),
+            "commit should be homomorphic"
+        );
+    }
+}
