@@ -1,11 +1,14 @@
 // Author: dWallet Labs, LTD.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
+pub mod multipedersen;
 pub mod pedersen;
+
+pub use multipedersen::MultiPedersen;
+pub use pedersen::Pedersen;
 
 use core::fmt::Debug;
 use crypto_bigint::Encoding;
 use crypto_bigint::{Concat, Limb};
-pub use pedersen::Pedersen;
 use serde::{Deserialize, Serialize};
 
 use group::{
