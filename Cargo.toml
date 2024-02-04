@@ -11,7 +11,11 @@ serde = { version = "1.0", features = ["derive"] }
 merlin = { version = "3", default-features = false }
 thiserror = "1.0"
 
+rand_core = { version = "0.6", features = ["std"], optional = true }
+
 [dev-dependencies]
+rand_core = { version = "0.6.4", features = ["std"] }
+bulletproofs = "4.0.0"
 
 [features]
-
+test_helpers = ["dep:rand_core"]
