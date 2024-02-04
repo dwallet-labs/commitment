@@ -18,7 +18,7 @@ use crate::{GroupsPublicParameters, GroupsPublicParametersAccessors, Homomorphic
 /// The public parameters ['PublicParameters'] for pedersen commitment should be carefully constructed,
 /// as wrong choice of generators can break the commitment's binding and/or hiding propert(ies).
 /// We offer a safe instantiation for prime-order groups with ['PublicParameters::derive'].
-/// Otherwise, it is on the responsibility of the caller to assure their group and generator instantiation is sound.
+/// Otherwise, it is the responsibility of the caller to assure their group and generator instantiation is sound.
 #[derive(PartialEq, Clone, Debug, Eq)]
 pub struct Pedersen<
     const BATCH_SIZE: usize,

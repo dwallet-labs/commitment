@@ -5,6 +5,7 @@ pub mod pedersen;
 use core::fmt::Debug;
 use crypto_bigint::Encoding;
 use crypto_bigint::{Concat, Limb};
+pub use pedersen::Pedersen;
 use serde::{Deserialize, Serialize};
 
 use group::{
