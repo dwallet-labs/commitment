@@ -26,9 +26,9 @@ pub struct Pedersen<
     Scalar: group::GroupElement,
     GroupElement: group::GroupElement,
 > {
-    /// The generators used for the messages
+    /// The generators used for the messages.
     message_generators: [GroupElement; BATCH_SIZE],
-    /// The generator used for the randomness
+    /// The generator used for the randomness.
     randomness_generator: GroupElement,
 
     _scalar_choice: PhantomData<Scalar>,
@@ -88,7 +88,7 @@ where
         message: &self_product::GroupElement<BATCH_SIZE, Scalar>,
         randomness: &Scalar,
     ) -> GroupElement {
-        // $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\rho)=m_1\cdot G_1 + \ldots + m_n\cdot G_n + \rho \cdot H$$
+        // $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\rho)=m_1\cdot G_1 + \ldots + m_n\cdot G_n + \rho \cdot H$$.
         self.message_generators
             .iter()
             .zip::<&[Scalar; BATCH_SIZE]>(message.into())
@@ -205,12 +205,12 @@ impl<
     /// know exactly what you're doing.
     ///
     /// It should be used, for example, for non-`PrimeGroupElement`
-    /// groups for which security have been proven.
+    /// groups for which security must be analized independently.
     ///
     /// Another use-case is for compatability reason, i.e. when needing to work with
     /// generators that were derived safely elsewhere.
     ///
-    /// For any other, and all traditional use-cases such as Pedersen over elliptic curves, use
+    /// In any other case, when possible, e.g. for all traditional use-cases such as Pedersen over elliptic curves, use
     /// [`Self::drive`] or [`Self::default`] instead.
     pub fn new<
         const SCALAR_LIMBS: usize,
