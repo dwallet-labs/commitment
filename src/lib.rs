@@ -1,17 +1,20 @@
 // Author: dWallet Labs, LTD.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
-
 pub mod multipedersen;
 pub mod pedersen;
 
-use core::fmt::Debug;
-
-use serde::{Deserialize, Serialize};
-
-use group::{BoundedGroupElement, GroupElement, Samplable};
-
 pub use multipedersen::MultiPedersen;
 pub use pedersen::Pedersen;
+
+use core::fmt::Debug;
+use crypto_bigint::Encoding;
+use crypto_bigint::{Concat, Limb};
+use serde::{Deserialize, Serialize};
+
+use group::{
+    BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, PartyID, Samplable,
+};
+use merlin::Transcript;
 
 /// Commitment error.
 #[derive(thiserror::Error, Clone, Debug, PartialEq)]
@@ -26,6 +29,39 @@ pub enum Error {
 
 /// Commitment result.
 pub type Result<T> = std::result::Result<T, Error>;
+
+/// Represents an unsigned integer sized based on the commitment size that matches security
+/// parameter, which is double in size, as collisions can be found in the root of the space.
+pub type CommitmentSizedNumber = <ComputationalSecuritySizedNumber as Concat>::Output;
+
+#[derive(PartialEq, Debug, Eq, Serialize, Deserialize, Clone, Copy)]
+pub struct Commitment(CommitmentSizedNumber);
+
+impl Commitment {
+    /// Create a commitment from a transcript that holds the data and, potentially, other context.
+    /// Supply a `context` to distinguish commitments between different protocols,
+    /// e.g. a string containing the protocol name & round name.
+    pub fn commit_transcript(
+        party_id: PartyID,
+        context: String,
+        transcript: &mut Transcript,
+        commitment_randomness: &ComputationalSecuritySizedNumber,
+    ) -> Self {
+        transcript.append_message(b"party ID", party_id.to_le_bytes().as_ref());
+
+        transcript.append_message(b"context", context.as_bytes());
+
+        transcript.append_message(
+            b"commitment randomness",
+            commitment_randomness.to_le_bytes().as_ref(),
+        );
+
+        let mut buf: Vec<u8> = vec![0u8; CommitmentSizedNumber::LIMBS * Limb::BYTES];
+        transcript.challenge_bytes(b"commitment", buf.as_mut_slice());
+
+        Commitment(CommitmentSizedNumber::from_le_slice(&buf))
+    }
+}
 
 /// A Homomorphic Commitment Scheme
 ///
@@ -177,3 +213,61 @@ pub type CommitmentSpacePublicParameters<const MESSAGE_SPACE_SCALAR_LIMBS: usize
 pub type CommitmentSpaceValue<const MESSAGE_SPACE_SCALAR_LIMBS: usize, C> = group::Value<
     <C as HomomorphicCommitmentScheme<MESSAGE_SPACE_SCALAR_LIMBS>>::CommitmentSpaceGroupElement,
 >;
+
+#[cfg(feature = "test_helpers")]
+pub mod test_helpers {
+    use super::*;
+    use rand_core::OsRng;
+
+    pub fn test_homomorphic_commitment_scheme<
+        const MESSAGE_SPACE_SCALAR_LIMBS: usize,
+        CommitmentScheme: HomomorphicCommitmentScheme<MESSAGE_SPACE_SCALAR_LIMBS>,
+    >(
+        public_parameters: &CommitmentScheme::PublicParameters,
+    ) {
+        let first_message = CommitmentScheme::MessageSpaceGroupElement::sample(
+            public_parameters.message_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+        let second_message = CommitmentScheme::MessageSpaceGroupElement::sample(
+            public_parameters.message_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+
+        let first_randomness = CommitmentScheme::RandomnessSpaceGroupElement::sample(
+            public_parameters.randomness_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+        let second_randomness = CommitmentScheme::RandomnessSpaceGroupElement::sample(
+            public_parameters.randomness_space_public_parameters(),
+            &mut OsRng,
+        )
+        .unwrap();
+
+        let commitment_scheme = CommitmentScheme::new(public_parameters).unwrap();
+        let first_commitment = commitment_scheme.commit(&first_message, &first_randomness);
+        let second_commitment = commitment_scheme.commit(&second_message, &second_randomness);
+
+        assert_ne!(
+            first_commitment, second_commitment,
+            "commitments over different messages should differ"
+        );
+        assert_ne!(
+            first_commitment,
+            commitment_scheme.commit(&first_message, &second_randomness),
+            "commitments over the same message using different randomness should differ"
+        );
+
+        assert_eq!(
+            first_commitment + second_commitment,
+            commitment_scheme.commit(
+                &(first_message + second_message),
+                &(first_randomness + second_randomness)
+            ),
+            "commit should be homomorphic"
+        );
+    }
+}

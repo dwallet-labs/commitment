@@ -233,4 +233,25 @@ mod tests {
 
         assert_eq!(expected_commitment, commitment[0].into())
     }
+
+    #[test]
+    #[cfg(feature = "test_helpers")]
+    fn test_homomorphic_commitment_scheme() {
+        let public_parameters = crate::pedersen::PublicParameters::default::<
+            { group::secp256k1::SCALAR_LIMBS },
+            group::secp256k1::GroupElement,
+        >()
+        .unwrap()
+        .into();
+
+        crate::test_helpers::test_homomorphic_commitment_scheme::<
+            { group::secp256k1::SCALAR_LIMBS },
+            MultiPedersen<
+                3,
+                { group::secp256k1::SCALAR_LIMBS },
+                group::secp256k1::Scalar,
+                group::secp256k1::GroupElement,
+            >,
+        >(&public_parameters);
+    }
 }
