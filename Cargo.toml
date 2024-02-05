@@ -13,3 +13,5 @@ thiserror = "1.0"
 
 [features]
 
+[net]
+git-fetch-with-cli = true
