@@ -9,7 +9,8 @@ use serde::{Deserialize, Serialize};
 use crate::{pedersen, GroupsPublicParameters, HomomorphicCommitmentScheme, Pedersen};
 
 /// A Batched Pedersen Commitment:
-/// $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\vec{\rho})=(m_1\cdot G + \rho_1 \cdot H, \ldots, m_n\cdot G + \rho_n \cdot H)$$
+/// $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\vec{\rho})=
+/// (m_1\cdot G + \rho_1 \cdot H, \ldots, m_n\cdot G + \rho_n \cdot H)$$
 #[derive(PartialEq, Clone, Debug, Eq)]
 pub struct MultiPedersen<
     const BATCH_SIZE: usize,
@@ -48,7 +49,8 @@ where
         message: &Self::MessageSpaceGroupElement,
         randomness: &Self::RandomnessSpaceGroupElement,
     ) -> Self::CommitmentSpaceGroupElement {
-        // $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\vec{\rho})=(m_1\cdot G + \rho_1 \cdot H, \ldots, m_n\cdot G + \rho_n \cdot H)$$
+        // $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\vec{\rho})=
+        // (m_1\cdot G + \rho_1 \cdot H, \ldots, m_n\cdot G + \rho_n \cdot H)$$
         let messages: [_; BATCH_SIZE] = (*message).into();
         let randomnesses: [_; BATCH_SIZE] = (*randomness).into();
 
@@ -184,9 +186,8 @@ mod tests {
     use group::ristretto;
     use rand_core::OsRng;
 
-    use crate::Pedersen;
-
     use super::*;
+    use crate::Pedersen;
 
     #[test]
     fn commits() {
@@ -237,7 +238,7 @@ mod tests {
     #[test]
     #[cfg(feature = "test_helpers")]
     fn test_homomorphic_commitment_scheme() {
-        let public_parameters = crate::pedersen::PublicParameters::default::<
+        let public_parameters = crate::pedersen::PublicParameters::derive_default::<
             { group::secp256k1::SCALAR_LIMBS },
             group::secp256k1::GroupElement,
         >()

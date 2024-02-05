@@ -3,18 +3,16 @@
 pub mod multipedersen;
 pub mod pedersen;
 
-pub use multipedersen::MultiPedersen;
-pub use pedersen::Pedersen;
-
 use core::fmt::Debug;
-use crypto_bigint::Encoding;
-use crypto_bigint::{Concat, Limb};
-use serde::{Deserialize, Serialize};
 
+use crypto_bigint::{Concat, Encoding, Limb};
 use group::{
     BoundedGroupElement, ComputationalSecuritySizedNumber, GroupElement, PartyID, Samplable,
 };
 use merlin::Transcript;
+pub use multipedersen::MultiPedersen;
+pub use pedersen::Pedersen;
+use serde::{Deserialize, Serialize};
 
 /// Commitment error.
 #[derive(thiserror::Error, Clone, Debug, PartialEq)]
@@ -40,7 +38,7 @@ pub struct Commitment(CommitmentSizedNumber);
 impl Commitment {
     /// Create a commitment from a transcript that holds the data and, potentially, other context.
     /// Supply a `context` to distinguish commitments between different protocols,
-    /// e.g. a string containing the protocol name & round name.
+    /// e.g., a string containing the protocol name & round name.
     pub fn commit_transcript(
         party_id: PartyID,
         context: String,
@@ -69,7 +67,7 @@ impl Commitment {
 /// defines a function $\calM_{\pp}\times \calR_{\pp} \rightarrow \calC_{\pp}$ for message space
 /// $\calM_{\pp}$, randomness space $\calR_{\pp}$ and commitment space $\calC_{\pp}$.
 ///
-/// In a homomorphic commitment $\calM,\calR$ and $\calC$ are all abelian groups,
+/// In a homomorphic commitment $\calM,\calR$ and $\calC$ are all Abelian groups,
 /// and for all $\vec{m}_1, \vec{m}_2 \in \calM$, $\rho_1, \rho_2\in \calR$ we have
 /// (in the following, `$+$' is defined differently for each group): $$ \Com(\vec{m}_1; \rho_1) +
 /// \Com(\vec{m}_2; \rho_2) = \Com(\vec{m}_1 + \vec{m}_2; \rho_1 + \rho_2) $$
@@ -107,15 +105,18 @@ pub trait HomomorphicCommitmentScheme<const MESSAGE_SPACE_SCALAR_LIMBS: usize>:
     /// public parameters.
     fn new(public_parameters: &Self::PublicParameters) -> Result<Self>;
 
-    /// $\Com_{\pp}$: the commitment function $\calM_{\pp}\times \calR_{\pp} \rightarrow \calC_{\pp}$
-    /// for message space $\calM_{\pp}$, randomness space $\calR_{\pp}$ and commitment space $\calC_{\pp}$.
+    /// $\Com_{\pp}$: the commitment function $\calM_{\pp}\times \calR_{\pp} \rightarrow
+    /// \calC_{\pp}$ for message space $\calM_{\pp}$, randomness space $\calR_{\pp}$ and
+    /// commitment space $\calC_{\pp}$.
     ///
-    /// For a message $\vec{m}\in \calM_{\pp}$, the algorithm draws $\rho \gets R_{\pp}$ uniformly at random,
-    /// and computes commitment $C = \Com_{\pp}(\vec{m};\rho)$.
+    /// For a message $\vec{m}\in \calM_{\pp}$, the algorithm draws $\rho \gets R_{\pp}$ uniformly
+    /// at random, and computes commitment $C = \Com_{\pp}(\vec{m};\rho)$.
     ///
-    /// Since this is a homomorphic commitment scheme, we have that $\calM,\calR$ and $\calC$ are all abelian groups, and for all $\vec{m}_1, \vec{m}_2 \in \calM$, $\rho_1, \rho_2\in \calR$
+    /// Since this is a homomorphic commitment scheme, we have that $\calM,\calR$ and $\calC$ are
+    /// all Abelian groups, and for all $\vec{m}_1, \vec{m}_2 \in \calM$, $\rho_1, \rho_2\in \calR$
     /// we have (in the following, `$+$' is defined differently for each group):
-    /// $$ \Com(\vec{m}_1; \rho_1) + \Com(\vec{m}_2; \rho_2) = \Com(\vec{m}_1 + \vec{m}_2; \rho_1 + \rho_2) $$
+    /// $$ \Com(\vec{m}_1; \rho_1) + \Com(\vec{m}_2; \rho_2) = \Com(\vec{m}_1 + \vec{m}_2; \rho_1 +
+    /// \rho_2) $$
     fn commit(
         &self,
         message: &Self::MessageSpaceGroupElement,
@@ -216,8 +217,9 @@ pub type CommitmentSpaceValue<const MESSAGE_SPACE_SCALAR_LIMBS: usize, C> = grou
 
 #[cfg(feature = "test_helpers")]
 pub mod test_helpers {
-    use super::*;
     use rand_core::OsRng;
+
+    use super::*;
 
     pub fn test_homomorphic_commitment_scheme<
         const MESSAGE_SPACE_SCALAR_LIMBS: usize,
