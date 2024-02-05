@@ -237,7 +237,7 @@ mod tests {
     #[test]
     #[cfg(feature = "test_helpers")]
     fn test_homomorphic_commitment_scheme() {
-        let public_parameters = crate::pedersen::PublicParameters::default::<
+        let public_parameters = crate::pedersen::PublicParameters::derive_default::<
             { group::secp256k1::SCALAR_LIMBS },
             group::secp256k1::GroupElement,
         >()

@@ -140,7 +140,7 @@ impl<
     >
     PublicParameters<BATCH_SIZE, GroupElementValue, ScalarPublicParameters, GroupPublicParameters>
 {
-    pub fn default<
+    pub fn derive_default<
         const SCALAR_LIMBS: usize,
         GroupElement: PrimeGroupElement<SCALAR_LIMBS> + HashToGroup,
     >() -> crate::Result<Self>
@@ -210,7 +210,7 @@ impl<
     /// generators that were derived safely elsewhere.
     ///
     /// In any other case, when possible, e.g. for all traditional use-cases such as Pedersen over elliptic curves, use
-    /// [`Self::drive`] or [`Self::default`] instead.
+    /// [`Self::derive`] or [`Self::derive_default`] instead.
     pub fn new<
         const SCALAR_LIMBS: usize,
         Scalar: group::GroupElement,
@@ -351,7 +351,7 @@ mod tests {
     #[test]
     #[cfg(feature = "test_helpers")]
     fn test_homomorphic_commitment_scheme() {
-        let public_parameters = PublicParameters::default::<
+        let public_parameters = PublicParameters::derive_default::<
             { group::secp256k1::SCALAR_LIMBS },
             group::secp256k1::GroupElement,
         >()
