@@ -20,6 +20,4 @@ bulletproofs = "4.0.0"
 [features]
 test_helpers = ["dep:rand_core"]
 
-[net]
-git-fetch-with-cli = true
 

@@ -62,7 +62,6 @@ where
 
         let message_generators = public_parameters
             .message_generators
-            .clone()
             .map(|value| {
                 GroupElement::new(
                     value,
@@ -72,8 +71,8 @@ where
             .flat_map_results()?;
 
         let randomness_generator = GroupElement::new(
-            public_parameters.randomness_generator.clone(),
-            &public_parameters.commitment_space_public_parameters(),
+            public_parameters.randomness_generator,
+            public_parameters.commitment_space_public_parameters(),
         )?;
 
         Ok(Self {
