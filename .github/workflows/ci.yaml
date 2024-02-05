@@ -17,6 +17,8 @@ env:
   # Change to specific Rust release to pin
   rust_stable: stable
   rust_nightly: nightly
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+  GH_PRIVATE_REPO_TOKEN: ${{ secrets.GH_PRIVATE_REPO_TOKEN }}
 
 jobs:
   build:
@@ -30,6 +32,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Configure git with personal access token
+        run: |
+          git config --global url."https://x-access-token:${{ env.GH_PRIVATE_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
