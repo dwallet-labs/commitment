@@ -13,13 +13,13 @@ use serde::{Deserialize, Serialize};
 use crate::{GroupsPublicParameters, GroupsPublicParametersAccessors, HomomorphicCommitmentScheme};
 
 /// A Batched Pedersen Commitment:
-/// $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\rho)=m_1\cdot G_1 + \ldots + m_n\cdot G_n +
-/// \rho \cdot H$$
+/// $$\Com_\pp(m;\rho):=\Ped.\Com_{\GG,G,H,q}(\vec{m},\rho)=
+/// m_1\cdot G_1 + \ldots + m_n\cdot G_n + \rho \cdot H$$
 ///
-/// The public parameters ['PublicParameters'] for pedersen commitment should be carefully
+/// The public parameters [`PublicParameters`] for pedersen commitment should be carefully
 /// constructed, as wrong choice of generators can break the commitment's binding and/or hiding
 /// propert(ies). We offer a safe instantiation for prime-order groups with
-/// ['PublicParameters::derive'] using `HashToGroup`. Otherwise, it is the responsibility of the
+/// [`PublicParameters::derive`] using [`HashToGroup`]. Otherwise, it is the responsibility of the
 /// caller to assure their group and generator instantiation is sound.
 #[derive(PartialEq, Clone, Debug, Eq)]
 pub struct Pedersen<
@@ -116,7 +116,7 @@ pub type CommitmentSpacePublicParameters<GroupElement> =
 /// The Public Parameters of a Pedersen Commitment.
 /// This struct should be carefully instantiated,
 /// as wrong choice of generators can break the commitment's binding and/or hiding propert(ies).
-/// We offer a safe instantiation for prime-order groups with ['PublicParameters::derive'] using
+/// We offer a safe instantiation for prime-order groups with [`PublicParameters::derive`] using
 /// `HashToGroup`. Otherwise, it is on the responsibility of the caller to assure their group and
 /// generator instantiation is sound.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
